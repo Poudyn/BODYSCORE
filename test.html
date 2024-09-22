@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ارسال درخواست به سرور</title>
+        <script>
+        // کد جاوا اسکریپت برای ارسال درخواست
+    </script>
+    </head>
+    <body>
+        <button onclick="sendHttpRequest()">ارسال درخواست</button>
+        <div id="result"></div>
+        <button onclick="retest()">ارسال درخواست</button>
+        <script>
+
+        function retest(){
+            fetch('http://127.0.0.1:5000/admin/admin_only', {
+                headers: {
+                    'Authorization': 'Bearer ' + localStorage.getItem("adtok")
+                }
+            }).then(x=>x.json().then(j=>{
+                console.log(j)
+            }))
+        }
+        function sendHttpRequest() {
+            localStorage.setItem("adtok",null)
+            // ایجاد یک شیء XMLHttpRequest
+            const xhr = new XMLHttpRequest();
+        
+            // تنظیم روش درخواست، آدرس و نوع داده
+            xhr.open('GET', 'http://127.0.0.1:5000/admin/login?username=admin&password=password', true); // GET برای دریافت داده، POST برای ارسال داده
+            xhr.responseType = 'json'; // انتظار داریم پاسخ به صورت JSON باشد
+        
+            // ارسال درخواست
+            xhr.send();
+        
+            // هنگامی که پاسخ از سرور دریافت شد
+            xhr.onprogress = (x)=>{
+                console.log(x)
+            }
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    localStorage.setItem("adtok",xhr.response.access_token)
+                    fetch('http://127.0.0.1:5000/admin/admin_only', {
+                        headers: {
+                            'Authorization': 'Bearer ' + localStorage.getItem("adtok")
+                        }
+                    }).then(x=>x.json().then(j=>{
+                        console.log(j)
+                    }))
+                } else {
+                    console.error('خطا در درخواست:', xhr.statusText);
+                }
+            };
+        }
+        
+    </script>
+    </body>
+</html>
